@@ -8,7 +8,7 @@ local Window = Rayfield:CreateWindow({
    LoadingTitle = "Loading da menu :P",
    LoadingSubtitle = "created by eggshellyummy",
    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
-
+ShowText = "hub",
    DisableRayfieldPrompts = false,
    DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
 
