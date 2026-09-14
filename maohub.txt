@@ -68,4 +68,77 @@ local Slider = MainTab:CreateSlider({
    Callback = function(Value)
    game.Players.LocalPlayer.Character.Humanoid.Walkspeed = (Value)
    end,
+local MainTab = Window:CreateTab("Coins", nil) -- Title, Image
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local autoTP = false
+local tpConnection = nil
+
+local function getHRP()
+    local char = LocalPlayer.Character
+    if not char then return nil end
+    return char:FindFirstChild("HumanoidRootPart")
+        or char:FindFirstChild("Torso")
+        or char:FindFirstChild("UpperTorso")
+end
+
+local function isCoin(obj)
+    local name = string.lower(obj.Name)
+    return name == "coins" or name == "coin" or string.find(name, "coin")
+end
+
+local function teleportObject(obj, targetCFrame)
+    if obj:IsA("Model") then
+        if obj.PrimaryPart then
+            pcall(function()
+                obj:SetPrimaryPartCFrame(targetCFrame)
+            end)
+        else
+            local part = obj:FindFirstChildWhichIsA("BasePart", true)
+            if part then
+                pcall(function()
+                    part.CFrame = targetCFrame
+                end)
+            end
+        end
+    elseif obj:IsA("BasePart") then
+        pcall(function()
+            obj.CFrame = targetCFrame
+        end)
+    end
+end
+
+local function doTeleport()
+    local hrp = getHRP()
+    if not hrp then return end
+
+    local target = hrp.CFrame * CFrame.new(0, 0, -3)
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if isCoin(obj) and (obj:IsA("Model") or obj:IsA("BasePart")) then
+            teleportObject(obj, target)
+        end
+    end
+end
+
+-- Example Toggle (paste this into your existing Tab)
+--[[
+Tab:CreateToggle({
+    Name = "Auto Collect Coins",
+    CurrentValue = false,
+    Flag = "AutoCoinTP",
+    Callback = function(Value)
+        autoTP = Value
+        if Value then
+            if tpConnection then tpConnection:Disconnect() end
+            tpConnection = RunService.Heartbeat:Connect(doTeleport)
+        else
+            if tpConnection then
+                tpConnection:Disconnect()
+                tpConnection = nil
+            end
+        end
 })
